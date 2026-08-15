@@ -1,0 +1,130 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id            String        @id @default(uuid())
+  name          String
+  email         String        @unique
+  passwordHash  String        @default("$2b$10$z4otCWYdbxukfFGZELtc.u1wDy6aq4BBuGq25IkuW0wQJhWPAr4GS")
+  role          UserRole      @default(MEMBER)
+  avatar        String?
+  phone         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  assignedTasks Task[]        @relation("AssignedTasks")
+  createdTasks  Task[]        @relation("CreatedTasks")
+  comments      Comment[]
+  activityLogs  ActivityLog[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Task {
+  id           String        @id @default(uuid())
+  title        String
+  description  String?
+  status       TaskStatus    @default(PENDING)
+  priority     TaskPriority  @default(MEDIUM)
+  dueDate      DateTime?
+  externalClient String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  assignedToId String?
+  assignee     User?         @relation("AssignedTasks", fields: [assignedToId], references: [id], onDelete: SetNull)
+  
+  createdById  String
+  creator      User          @relation("CreatedTasks", fields: [createdById], references: [id], onDelete: Cascade)
+
+  comments     Comment[]
+  activityLogs ActivityLog[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([assignedToId])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@map("tasks")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  comment   String
+  createdAt DateTime @default(now())
+
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("comments")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String
+  oldValue  String?
+  newValue  String?
+  createdAt DateTime @default(now())
+
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("activity_logs")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  type      String   // TASK_ASSIGNED, TASK_COMPLETED, COMMENT_ADDED
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model Setting {
+  key   String @id
+  value String
+
+  @@map("settings")
+}
