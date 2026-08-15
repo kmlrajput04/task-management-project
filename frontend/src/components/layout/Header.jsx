@@ -66,6 +66,16 @@ export const Header = () => {
     dispatch(markReadAsync(id));
   };
 
+  const handleNotificationClick = (notification) => {
+    if (notification?.taskId) {
+      navigate(`/tasks/${notification.taskId}`);
+    }
+    if (!notification?.read) {
+      dispatch(markReadAsync(notification.id));
+    }
+    setNotificationsOpen(false);
+  };
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
@@ -123,7 +133,7 @@ export const Header = () => {
                   notifications.map((n) => (
                     <div
                       key={n.id}
-                      onClick={() => !n.read && handleMarkRead(n.id)}
+                      onClick={() => handleNotificationClick(n)}
                       className={`pt-2 first:pt-0 flex gap-2.5 items-start cursor-pointer group transition-colors rounded p-1.5 -mx-1.5 ${
                         n.read ? 'opacity-60 hover:bg-slate-800/30' : 'hover:bg-slate-800/50'
                       }`}

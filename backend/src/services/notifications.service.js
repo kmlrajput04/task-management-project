@@ -15,12 +15,13 @@ export const notificationsService = {
     return await notificationsRepository.findMany(userId);
   },
 
-  async createNotification(userId, { title, message, type }) {
+  async createNotification(userId, { title, message, type, taskId = null }) {
     return await notificationsRepository.create({
       userId,
       title,
       message,
       type,
+      taskId,
       read: false
     });
   },

@@ -83,7 +83,8 @@ export class TasksService extends BaseService {
         await notificationsService.createNotification(createdTask.assignedToId, {
           title: 'New Task Assigned',
           message: `${creatorExists.name} assigned task '${createdTask.title}' to you`,
-          type: 'TASK_ASSIGNED'
+          type: 'TASK_ASSIGNED',
+          taskId: createdTask.id
         });
       } catch (err) {
         console.error('Failed to trigger task assignment notification:', err);
@@ -153,7 +154,8 @@ export class TasksService extends BaseService {
           await notificationsService.createNotification(recipientId, {
             title: isCompleted ? 'Task Completed' : 'Task Status Changed',
             message: `${performer?.name || 'Someone'} changed status of '${updatedTask.title}' to ${taskFields.status.replace('_', ' ')}`,
-            type: isCompleted ? 'TASK_COMPLETED' : 'STATUS_CHANGED'
+            type: isCompleted ? 'TASK_COMPLETED' : 'STATUS_CHANGED',
+            taskId: updatedTask.id
           });
         }
       } catch (err) {
@@ -187,7 +189,8 @@ export class TasksService extends BaseService {
           await notificationsService.createNotification(taskFields.assignedToId, {
             title: 'New Task Assigned',
             message: `${performer?.name || 'Someone'} assigned task '${updatedTask.title}' to you`,
-            type: 'TASK_ASSIGNED'
+            type: 'TASK_ASSIGNED',
+            taskId: updatedTask.id
           });
         } catch (err) {
           console.error('Failed to trigger task reassignment notification:', err);

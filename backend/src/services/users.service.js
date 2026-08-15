@@ -40,16 +40,23 @@ export class UsersService extends BaseService {
       throw new ConflictError(`Email ${data.email} is already in use`);
     }
 
-    // Generate custom password
-    // Rule: first 4 letters of name + last 4 digits of phone number
     const cleanName = (data.name || '').replace(/\s+/g, '').toLowerCase();
-    const namePart = cleanName.substring(0, 4).padEnd(4, 'x');
+    if (cleanName.length < 4) {
+      throw new ConflictError('Name must be at least 4 characters long');
+    }
 
     const cleanPhone = (data.phone || '').replace(/\D/g, '');
+    if (cleanPhone.length < 4) {
+      throw new ConflictError('Phone number is required and must have at least 4 digits to generate the password');
+    }
+
+    // Generate custom password
+    // Rule: first 4 letters of name + last 4 digits of phone number
+    const namePart = cleanName.substring(0, 4).padEnd(4, 'x');
     const phonePart = cleanPhone.substring(Math.max(0, cleanPhone.length - 4)).padStart(4, '0');
 
     const plainPassword = namePart + phonePart;
-    
+
     // Hash the generated password
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(plainPassword, salt);

@@ -66,6 +66,7 @@ model Task {
 
   comments     Comment[]
   activityLogs ActivityLog[]
+  notifications Notification[]
 
   @@index([status])
   @@index([priority])
@@ -114,11 +115,15 @@ model Notification {
   type      String   // TASK_ASSIGNED, TASK_COMPLETED, COMMENT_ADDED
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
-  
+
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([taskId])
   @@map("notifications")
 }
 

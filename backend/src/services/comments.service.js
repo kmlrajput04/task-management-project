@@ -61,7 +61,8 @@ export const commentsService = {
         await notificationsService.createNotification(task.assignedToId, {
           title: 'New Comment',
           message: `${user.name} commented on task '${task.title}'`,
-          type: 'COMMENT_ADDED'
+          type: 'COMMENT_ADDED',
+          taskId: task.id
         });
       } catch (err) {
         console.error('Failed to trigger comment notification:', err);

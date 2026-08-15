@@ -151,16 +151,22 @@ export const UsersPage = () => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const errors = {};
-    if (!formData.name.trim()) errors.name = 'Name is required';
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    } else if (formData.name.trim().length < 4) {
+      errors.name = 'Name must be at least 4 characters long';
+    }
+
     if (!formData.email.trim()) {
       errors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Invalid email address format';
     }
+
     if (!formData.phone.trim()) {
-      errors.phone = 'Phone number is required';
+      errors.phone = 'Phone number is required to generate the password';
     } else if (formData.phone.replace(/\D/g, '').length < 4) {
-      errors.phone = 'Phone number must have at least 4 digits';
+      errors.phone = 'Phone number must have at least 4 digits to generate the password';
     }
 
     if (Object.keys(errors).length > 0) {
