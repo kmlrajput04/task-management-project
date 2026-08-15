@@ -37,7 +37,7 @@ TaskHub Pro is a professional internal workspace platform designed for teams to 
 - **State Management**: Redux Toolkit & React Redux
 - **Data Querying**: TanStack Query (React Query) & Axios
 - **Form Management**: React Hook Form & Zod Client validations
-- **Styling**: Vanilla CSS custom styles
+- **Styling**: Tailwind CSS v4 with Vite plugin and global stylesheet imports
 - **Icons & Alerts**: Lucide React & Sonner toaster popups
 
 ### Backend
